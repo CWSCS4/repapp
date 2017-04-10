@@ -1,10 +1,5 @@
-module.exports = (sequelize, Sequelize) => {
-  const preferenceType = {
-    type: Sequelize.BOOLEAN,
-    allowNull: false
-  }
-
-  return sequelize.define('user', {
+module.exports = (sequelize, Sequelize) =>
+  sequelize.define('user', {
     email: {
       type: Sequelize.STRING,
       allowNull: false,
@@ -14,9 +9,20 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false
     },
-    emailOnPeriodChoice: preferenceType,
-    emailOnCancellation: preferenceType,
-    emailOnNoteChange: preferenceType,
-    emailDailyDigest: preferenceType
+    emailOnPeriodChoice: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false
+    },
+    emailOnCancellation: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false
+    },
+    emailOnNoteChange: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false
+    },
+    emailDailyDigest: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false
+    }
   })
-}
