@@ -14,8 +14,12 @@ module.exports = (sequelize, Sequelize) =>
       type: Sequelize.STRING(50),
       allowNull: false
     },
-    time: {
-      type: Sequelize.RANGE(Sequelize.TIME),
+    start: {
+      type: Sequelize.TIME,
+      allowNull: false
+    },
+    end: {
+      type: Sequelize.TIME,
       allowNull: false
     }
   })
