@@ -1,18 +1,20 @@
-module.exports = (sequelize, Sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   const UnavailablePeriod = sequelize.define('unavailable_period', {
-    reason: Sequelize.STRING,
-    time: {
-      type: Sequelize.RANGE(Sequelize.DATE),
+    reason: DataTypes.STRING,
+    day: {
+      type: DataTypes.DATEONLY,
       allowNull: false
     },
     repeatWeekly: {
-      type: Sequelize.BOOLEAN,
+      type: DataTypes.BOOLEAN,
       allowNull: false
     },
-    repeatEnd: Sequelize.DATEONLY, //inclusive
-  }, {
+    repeatEnd: DataTypes.DATEONLY //inclusive
+  },
+  {
     classMethods: {
-      associate({tier}) {
+      associate({period, tier}) {
+        UnavailablePeriod.belongsTo(period)
         UnavailablePeriod.belongsTo(tier)
       }
     }

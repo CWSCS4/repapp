@@ -6,6 +6,6 @@
 const app = require('./app')
 const models = require('./models')
 
-models.sequelize.sync().then(function() {
+models.sequelize.sync({force: true}).then(function() {
   app.listen(8000)
 })
