@@ -1,11 +1,12 @@
-module.exports = (sequelize, Sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   const UnavailableDay = sequelize.define('unavailable_day', {
-    reason: Sequelize.STRING,
+    reason: DataTypes.STRING,
     days: {
-      type: Sequelize.RANGE(Sequelize.DATE),
+      type: DataTypes.RANGE(DataTypes.DATE),
       allowNull: false
     }
-  }, {
+  },
+  {
     classMethods: {
       associate({tier}) {
         UnavailableDay.belongsTo(tier)

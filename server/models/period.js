@@ -1,7 +1,7 @@
-module.exports = (sequelize, Sequelize) =>
+module.exports = (sequelize, DataTypes) =>
   sequelize.define('period', {
     day: {
-      type: Sequelize.ENUM(
+      type: DataTypes.ENUM(
         'Monday',
         'Tuesday',
         'Wednesday',
@@ -11,15 +11,15 @@ module.exports = (sequelize, Sequelize) =>
       allowNull: false
     },
     period: {
-      type: Sequelize.STRING(50),
+      type: DataTypes.STRING(50),
       allowNull: false
     },
     start: {
-      type: Sequelize.TIME,
+      type: DataTypes.TIME,
       allowNull: false
     },
     end: {
-      type: Sequelize.TIME,
+      type: DataTypes.TIME,
       allowNull: false
     }
   })
