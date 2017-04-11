@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "express": "^4.15.2",
+    "express-session": "^1.15.2",
+    "password-hash-and-salt": "^0.1.4",
     "pg": "^6.1.5",
     "sequelize": "^3.30.4",
     "vue": "^2.2.1"
