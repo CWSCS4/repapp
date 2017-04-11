@@ -50,6 +50,18 @@ app.post(
     })
   }
 )
+function restrictToLoggedIn(req, res, next) {
+  if (req.session.admin) next()
+  else res.json({success: false, message: 'Must be logged in'})
+}
+
+app.get(
+  '/api/restricted',
+  restrictToLoggedIn,
+  (req, res) => {
+    res.json({success: true, response: "You're in!"})
+  }
+)
 
 // This address is relative to where the node process is started.
 app.use(express.static('public'))
