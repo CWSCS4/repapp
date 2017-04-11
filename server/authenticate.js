@@ -1,11 +1,12 @@
-const Admin = require('./models').admin
-const password = require('password-hash-and-salt')
+const Admin = require('./database').admin
+const passwordHash = require('password-hash-and-salt')
 
 module.exports = (email, password, callback) => {
   Admin.findOne({
     where: {email}
   }).then(admin => {
-    password(password).verifyAgainst(admin.passwordHash, (err, verified) => {
+    if (admin === null) throw new Error('No such user')
+    passwordHash(password).verifyAgainst(admin.passwordHash, (err, verified) => {
       if (err) callback(err, null)
       else {
         if (verified) callback(null, admin)
