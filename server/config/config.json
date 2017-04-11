@@ -1,5 +1,5 @@
 {
   "development": {
-    "uri": "postgres://repapp@localhost:5432/repapp"
+    "uri": "postgres://repapp:repapp@localhost:5432/repapp"
   }
 }
