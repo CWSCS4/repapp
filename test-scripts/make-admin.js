@@ -1,4 +1,4 @@
-const Admin = require('./server/database').admin
+const Admin = require('../server/database').admin
 
 Admin.create({
     email: 'tpaul@commschool.org',

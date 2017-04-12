@@ -8,7 +8,7 @@ function hashPassword(admin) {
       else resolve(hash)
     })
   })
-    .then(hash => admin.setDataValue('passwordHash', hash))
+    .then(hash => admin.passwordHash = hash)
 }
 
 module.exports = (sequelize, DataTypes) =>
