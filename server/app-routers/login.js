@@ -1,6 +1,7 @@
 const Admin = require('../database').admin
 const bodyParser = require('body-parser')
 const passwordHash = require('password-hash-and-salt')
+const restrictToLoggedIn = require('../restrict-to-logged-in')
 const validatePostParams = require('../validate-post-params')
 
 function authenticate(email, password) {
@@ -47,10 +48,6 @@ module.exports = app => {
         .catch(err => res.json({success: false, message: err.message}))
     }
   )
-  function restrictToLoggedIn(req, res, next) {
-    if (req.session.admin) next()
-    else res.json({success: false, message: 'Must be logged in'})
-  }
 
   app.get(
     '/api/restricted',
