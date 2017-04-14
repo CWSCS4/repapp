@@ -1,8 +1,8 @@
 const crypto = require('crypto')
 const express = require('express')
-const fs = require('fs')
-const path = require('path')
 const session = require('express-session')
+
+const apiRouter = require('./app-routers/api')
 
 const app = express()
 
@@ -12,12 +12,7 @@ app.use(session({
   saveUninitialized: false
 }))
 
-const ROUTERS_PATH = path.join(__dirname, 'app-routers')
-const routers = fs.readdirSync(ROUTERS_PATH)
-for (const routerFile of routers) {
-  const router = require(path.join(ROUTERS_PATH, routerFile))
-  router(app)
-}
+app.use('/api', apiRouter)
 
 // This address is relative to where the node process is started.
 app.use(express.static('public'))
