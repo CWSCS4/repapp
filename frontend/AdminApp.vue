@@ -17,9 +17,21 @@
 
       <md-list>
         <md-list-item>
-          <router-link to="/links" @click.native="toggleSidebar">
+          <router-link to="/admin/calendar" @click.native="toggleSidebar">
+            <md-icon>view_week</md-icon>
+            Calendar
+          </router-link>
+        </md-list-item>
+        <md-list-item>
+          <router-link to="/admin/links" @click.native="toggleSidebar">
             <md-icon>list</md-icon>
             Links
+          </router-link>
+        </md-list-item>
+        <md-list-item>
+          <router-link to="/admin/settings" @click.native="toggleSidebar">
+            <md-icon>settings</md-icon>
+            Settings
           </router-link>
         </md-list-item>
       </md-list>
