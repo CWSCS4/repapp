@@ -30,18 +30,25 @@
             </a>
           </md-table-cell>
           <md-table-cell>
-            <span v-if="link.lastSignedIn">
-              Last signed in on
-              {{ link.lastSignedIn.getMonth() + 1 }}/{{ link.lastSignedIn.getDate() }}
+            <span v-if="link.scheduledTime">
+              Scheduled for
+              {{ link.scheduledTime[0].getMonth() + 1 }}/{{ link.scheduledTime[0].getDate() }}
             </span>
             <span v-else>
-              Never logged in
+              <span v-if="link.lastSignedIn">
+                Last signed in on
+                {{ link.lastSignedIn.getMonth() + 1 }}/{{ link.lastSignedIn.getDate() }}
+              </span>
+              <span v-else>
+                Never logged in
+              </span>
             </span>
           </md-table-cell>
           <md-table-cell @click.native="openNotes(link)">
             <span :class="link.notesFromCollegeSeen ? null : 'unseen'">
               {{ link.shortenedNotes }}
             </span>
+            <md-icon>message</md-icon>
           </md-table-cell>
         </md-table-row>
       </md-table-body>
@@ -56,17 +63,28 @@
         <form>
           <md-input-container>
             <label>College</label>
-            <md-input required id="college"></md-input>
+            <md-input required v-model="linkForm.college"></md-input>
           </md-input-container>
           <md-input-container>
             <label>Rep name</label>
-            <md-input id="rep-name"></md-input>
+            <md-input v-model="linkForm.repName"></md-input>
           </md-input-container>
-          <!--tier-->
-          <!--notes to college-->
+          <md-input-container>
+            <label>Tier</label>
+            <md-select required v-model="linkForm.tier">
+              <md-option v-for="tier in tiers" v-bind:value="tier.priority">
+                {{ tier.description }}
+              </md-option>
+            </md-select>
+          </md-input-container>
+          <md-input-container>
+            <label>Notes to college</label>
+            <md-textarea v-model="linkForm.notesToCollege"></md-textarea>
+          </md-input-container>
         </form>
       </md-dialog-content>
       <md-dialog-actions>
+        <md-spinner md-indeterminate v-show="waitingForLink"></md-spinner>
         <md-button class="md-primary" @click.native="closeLinkForm">Cancel</md-button>
         <md-button class="md-primary" @click.native="createLink">Create</md-button>
       </md-dialog-actions>
@@ -78,11 +96,12 @@
   const MAX_NOTES_LENGTH = 40
   const ELLIPSIS = '...'
   class Link {
-    constructor({college, repName, uuid, lastSignedIn, notesFromCollege, notesFromCollegeSeen}) {
+    constructor({college, repName, uuid, lastSignedIn, scheduledTime, notesFromCollege, notesFromCollegeSeen}) {
       this.college = college
       this.repName = repName
       this.uuid = uuid
       this.lastSignedIn = lastSignedIn
+      this.scheduledTime = scheduledTime
       this.notesFromCollege = notesFromCollege
       this.notesFromCollegeSeen = notesFromCollegeSeen
     }
@@ -97,16 +116,29 @@
       else return notes
     }
   }
+  function emptyLinkForm(tiers) {
+    return {
+      college: '',
+      repName: '',
+      tier: tiers[0].priority,
+      notesToCollege: ''
+    }
+  }
   export default {
     name: 'links-view',
     data() {
+      const tiers = [ //will eventually be populated from a request
+        {priority: 1, description: 'High'},
+        {priority: 2, description: 'Low'}
+      ]
       return {
-        links: [
+        links: [ //will eventually be populated from a request
           new Link({
             college: 'Swarthmore',
             repName: 'Josh Throckmorton',
             uuid: 'abcdef',
             lastSignedIn: null,
+            scheduledTime: null,
             notesFromCollege: 'Long notes string, hoping this gets cut off',
             notesFromCollegeSeen: true
           }),
@@ -115,10 +147,23 @@
             repName: null,
             uuid: '123456',
             lastSignedIn: new Date,
+            scheduledTime: [new Date, new Date(new Date().getTime() + 40 * 60 * 1000)],
             notesFromCollege: 'Blah blah blah',
+            notesFromCollegeSeen: false
+          }),
+          new Link({
+            college: 'University of Toronto',
+            repName: 'John',
+            uuid: 'efefef',
+            lastSignedIn: new Date,
+            scheduledTime: null,
+            notesFromCollege: 'Long notes string, hoping this gets cut off',
             notesFromCollegeSeen: false
           })
         ],
+        tiers,
+        linkForm: emptyLinkForm(tiers),
+        waitingForLink: false,
         selectedNotes: "Click on a college's notes" //should never be shown to the user
       }
     },
@@ -134,7 +179,12 @@
         this.$refs.linkForm.close()
       },
       createLink() {
-        this.closeLinkForm()
+        this.waitingForLink = true
+        setTimeout(() => { //will eventually actually send a request, so we simulate it here
+          this.closeLinkForm()
+          this.waitingForLink = false
+          this.linkForm = emptyLinkForm(this.tiers)
+        }, 1000)
       }
     }
   }
