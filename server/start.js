@@ -10,8 +10,8 @@ const request = require('request')
 database.sequelize.sync().then(function() {
   app.listen(8000)
 
-  /*request.post(
-    'http://localhost:8000/api/link',
+  request.post(
+    'http://localhost:8000/api/admin/link',
     { json: {collegeName:"Northwestern", repName:"Unknown", tierPriority:1, toCollege:"Hello!"} },
     function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -19,7 +19,7 @@ database.sequelize.sync().then(function() {
         }
         else {console.log(error)}
     }
-)*/
+)
 })
 
 
