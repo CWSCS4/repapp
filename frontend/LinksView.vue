@@ -1,8 +1,8 @@
 <template>
   <div>
-    <router-link tag="md-button" to="/admin/links/new" class="md-raised md-primary">
+    <md-button class="md-raised md-primary" id="new-link" @click.native="openLinkForm">
       New Link
-    </router-link>
+    </md-button>
     <md-table>
       <md-table-header>
         <md-table-row>
@@ -49,6 +49,28 @@
 
     <md-dialog-alert :md-content='selectedNotes' md-ok-text="Close" ref="notesDialog">
     </md-dialog-alert>
+
+    <md-dialog md-open-from="#new-link" md-close-to="#new-link" ref='linkForm'>
+      <md-dialog-title>Create new link</md-dialog-title>
+      <md-dialog-content>
+        <form>
+          <md-input-container>
+            <label>College</label>
+            <md-input required id="college"></md-input>
+          </md-input-container>
+          <md-input-container>
+            <label>Rep name</label>
+            <md-input id="rep-name"></md-input>
+          </md-input-container>
+          <!--tier-->
+          <!--notes to college-->
+        </form>
+      </md-dialog-content>
+      <md-dialog-actions>
+        <md-button class="md-primary" @click.native="closeLinkForm">Cancel</md-button>
+        <md-button class="md-primary" @click.native="createLink">Create</md-button>
+      </md-dialog-actions>
+    </md-dialog>
   </div>
 </template>
 
@@ -104,6 +126,15 @@
       openNotes(link) {
         this.selectedNotes = link.notesFromCollege
         this.$refs.notesDialog.open()
+      },
+      openLinkForm() {
+        this.$refs.linkForm.open()
+      },
+      closeLinkForm() {
+        this.$refs.linkForm.close()
+      },
+      createLink() {
+        this.closeLinkForm()
       }
     }
   }
