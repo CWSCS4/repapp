@@ -1,32 +1,30 @@
 <template>
   <div>
-    <md-layout md-gutter="24">
-      <md-layout v-for="day in days">
-        <md-layout md-column md-gutter="8">
-          <md-layout>
-            <b class="day">{{ day.name }}</b>
-          </md-layout>
-          <md-layout v-for="period in day.periods">
-            <md-whiteframe md-elevation="5" class="period">
-              <md-layout md-column>
-                <md-layout>
-                  <div class="period-times">
-                    {{ period.time[0].toHHMM() }}
-                    -
-                    {{ period.time[1].toHHMM() }}
-                  </div>
-                </md-layout>
-                <md-layout>
-                  <div class="name">
-                    {{ period.period }}
-                  </div>
-                </md-layout>
-              </md-layout>
-            </md-whiteframe>
-          </md-layout>
-        </md-layout>
-      </md-layout>
-    </md-layout>
+    <md-table>
+      <md-table-header>
+        <md-table-row>
+          <md-table-head v-for="(day, dayIndex) in days" class="center">
+            {{ day.name }} ({{ mondayDate.getDate() }})
+          </md-table-head>
+        </md-table-row>
+      </md-table-header>
+      <md-table-body>
+        <md-table-row v-for="index in maxPeriods()">
+          <md-table-cell v-for="day in days">
+            <md-card md-with-hover>
+              <md-card-header>
+                <div class="md-title">{{ day.periods[index - 1].period }}</div>
+                <div class="md-subhead">
+                  {{ day.periods[index - 1].time[0].toHHMM() }}
+                  -
+                  {{ day.periods[index - 1].time[1].toHHMM() }}
+                </div>
+              </md-card-header>
+            </md-card>
+          </md-table-cell>
+        </md-table-row>
+      </md-table-body>
+    </md-table>
   </div>
 </template>
 
@@ -109,19 +107,24 @@
               {period: '7', time: [makeTime(2, 5), makeTime(2, 45)]}
             ]
           }
-        ]
+        ],
+        mondayDate: new Date(now.getTime() - (now.getDay() - 1) * 86400000)
+      }
+    },
+    methods: {
+      maxPeriods() {
+        let max
+        for (const day of this.days) {
+          const dayPeriods = day.periods.length
+          if (max === undefined || dayPeriods > max) max = dayPeriods
+        }
+        return max
       }
     }
   }
 </script>
 
 <style lang="sass" scoped>
-  b.day
-    font-size: 24px
-
-  .period
-    width: 100%
-
-  b.day, div.name, div.period-times
-    margin: auto
+  .center
+    text-align: center
 </style>
