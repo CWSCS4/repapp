@@ -1,27 +1,28 @@
 <template>
   <div>
-    <md-layout md-gutter="16">
+    <md-layout md-gutter="24">
       <md-layout v-for="day in days">
-        <md-layout md-column>
-          <md-layout md-align="center">
-            <md-layout>
-              <b class="day">{{ day.name }}</b>
-            </md-layout>
-            <md-layout v-for="period in day.periods" md-flex="100" class="period">
+        <md-layout md-column md-gutter="8">
+          <md-layout>
+            <b class="day">{{ day.name }}</b>
+          </md-layout>
+          <md-layout v-for="period in day.periods">
+            <md-whiteframe md-elevation="5" class="period">
               <md-layout md-column>
-                <md-layout class="period-times">
-                  {{ (period.time[0].getHours() + 11) % 12 + 1 }}
-                  :
-                  <span v-if="period.time[0].getMinutes() < 10">0</span>
-                  {{ period.time[0].getMinutes() }}
+                <md-layout>
+                  <div class="period-times">
+                    {{ period.time[0].toHHMM() }}
+                    -
+                    {{ period.time[1].toHHMM() }}
+                  </div>
                 </md-layout>
-                <md-layout class="name">
-                  <div style="margin:auto">
+                <md-layout>
+                  <div class="name">
                     {{ period.period }}
                   </div>
                 </md-layout>
               </md-layout>
-            </md-layout>
+            </md-whiteframe>
           </md-layout>
         </md-layout>
       </md-layout>
@@ -32,7 +33,16 @@
 <script>
   const now = new Date
   function makeTime(hour, minute) {
-    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute)
+    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute)
+    date.toHHMM = function() {
+      return (
+        String((this.getHours() + 11) % 12 + 1) +
+        ':' +
+        (this.getMinutes() < 10 ? '0' : '') +
+        String(this.getMinutes())
+      )
+    }
+    return date
   }
   export default {
     name: 'calendar-view',
@@ -108,4 +118,10 @@
 <style lang="sass" scoped>
   b.day
     font-size: 24px
+
+  .period
+    width: 100%
+
+  b.day, div.name, div.period-times
+    margin: auto
 </style>
