@@ -1,10 +1,23 @@
 <template>
   <div>
+    <md-toolbar class="md-dense">
+      <md-button class="md-icon-button" @click.native="lastWeek">
+        <md-icon>chevron_left</md-icon>
+      </md-button>
+      <md-button @click.native="today">
+        Today
+      </md-button>
+      <md-button class="md-icon-button" @click.native="nextWeek">
+        <md-icon>chevron_right</md-icon>
+      </md-button>
+      <md-spinner md-indeterminate md-size="40" class="md-accent" v-if="loading"></md-spinner>
+    </md-toolbar>
     <md-table>
       <md-table-header>
         <md-table-row>
           <md-table-head v-for="(day, dayIndex) in days" class="center">
-            {{ day.name }} ({{ mondayDate.getDate() }})
+            {{ day.name }}
+            ({{ mondayDate.addDays(dayIndex).toShortDate() }})
           </md-table-head>
         </md-table-row>
       </md-table-header>
@@ -18,6 +31,12 @@
                   {{ day.periods[index - 1].time[0].toHHMM() }}
                   -
                   {{ day.periods[index - 1].time[1].toHHMM() }}
+                  <div class="unavailable" v-if="unavailabilities.periods.has(day.periods[index - 1])">
+                    Unavailable
+                    <md-tooltip md-direction="top">
+                      {{ unavailabilities.periods.get(day.periods[index - 1]).reason }}
+                    </md-tooltip>
+                  </span>
                 </div>
               </md-card-header>
             </md-card>
@@ -29,19 +48,24 @@
 </template>
 
 <script>
-  const now = new Date
-  function makeTime(hour, minute) {
-    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute)
-    date.toHHMM = function() {
-      return (
-        String((this.getHours() + 11) % 12 + 1) +
-        ':' +
-        (this.getMinutes() < 10 ? '0' : '') +
-        String(this.getMinutes())
-      )
-    }
-    return date
+  Date.prototype.addDays = function(days) {
+    return new Date(this.getTime() + 86400000 * days)
   }
+  Date.prototype.toHHMM = function() {
+    return (
+      String((this.getHours() + 11) % 12 + 1) +
+      ':' +
+      (this.getMinutes() < 10 ? '0' : '') +
+      String(this.getMinutes())
+    )
+  }
+  Date.prototype.toShortDate = function() {
+    return String(this.getMonth() + 1) + '/' + String(this.getDate())
+  }
+  const now = new Date
+  const makeTime = (hour, minute) =>
+    new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute)
+  const lastMonday = now.addDays(1 - now.getDay())
   export default {
     name: 'calendar-view',
     data() {
@@ -108,7 +132,12 @@
             ]
           }
         ],
-        mondayDate: new Date(now.getTime() - (now.getDay() - 1) * 86400000)
+        mondayDate: lastMonday,
+        unavailabilities: {
+          days: new Map,
+          periods: new Map
+        },
+        loading: false
       }
     },
     methods: {
@@ -119,6 +148,32 @@
           if (max === undefined || dayPeriods > max) max = dayPeriods
         }
         return max
+      },
+      lastWeek() {
+        this.mondayDate = this.mondayDate.addDays(-7)
+      },
+      today() {
+        this.mondayDate = lastMonday
+      },
+      nextWeek() {
+        this.mondayDate = this.mondayDate.addDays(7)
+      },
+      getUnavailabilities() {
+        this.loading = true
+        setTimeout(() => { //this will eventually actually send a request to the server
+          this.loading = false
+          this.unavailabilities.periods = new Map()
+            .set(this.days[1].periods[Math.floor(Math.random() * 7)], {reason: 'Special assembly', tierPriority: 2})
+            .set(this.days[4].periods[Math.floor(Math.random() * 7)], {reason: 'Calc 2', tierPriority: 0})
+        }, 500)
+      }
+    },
+    mounted() {
+      this.getUnavailabilities()
+    },
+    watch: {
+      mondayDate() {
+        this.getUnavailabilities()
       }
     }
   }
@@ -127,4 +182,7 @@
 <style lang="sass" scoped>
   .center
     text-align: center
+
+  div.unavailable
+    background: red
 </style>
