@@ -15,30 +15,32 @@
     <md-table>
       <md-table-header>
         <md-table-row>
-          <md-table-head v-for="(day, dayIndex) in days" class="center">
+          <md-table-head class="center" v-for="(day, dayIndex) in days" :class="{unavailable: isUnavailableDay(day)}">
             {{ day.name }}
             ({{ mondayDate.addDays(dayIndex).toShortDate() }})
+            <md-tooltip md-direction="bottom" v-if="admin && isUnavailableDay(day)">
+              Unavailability reason:
+              {{ unavailabilities.days.get(day.name).reason }}
+            </md-tooltip>
           </md-table-head>
         </md-table-row>
       </md-table-header>
       <md-table-body>
         <md-table-row v-for="index in maxPeriods()">
           <md-table-cell v-for="day in days">
-            <md-card md-with-hover>
+            <md-card md-with-hover :class="{unavailable: isUnavailablePeriod(day.periods[index - 1])}">
               <md-card-header>
                 <div class="md-title">{{ day.periods[index - 1].period }}</div>
                 <div class="md-subhead">
                   {{ day.periods[index - 1].time[0].toHHMM() }}
                   -
                   {{ day.periods[index - 1].time[1].toHHMM() }}
-                  <div class="unavailable" v-if="unavailabilities.periods.has(day.periods[index - 1])">
-                    Unavailable
-                    <md-tooltip md-direction="top">
-                      {{ unavailabilities.periods.get(day.periods[index - 1]).reason }}
-                    </md-tooltip>
-                  </span>
                 </div>
               </md-card-header>
+              <md-tooltip md-direction="top" v-if="admin && isUnavailablePeriod(day.periods[index - 1])">
+                Unavailability reason:
+                {{ unavailabilities.periods.get(day.periods[index - 1]).reason }}
+              </md-tooltip>
             </md-card>
           </md-table-cell>
         </md-table-row>
@@ -68,6 +70,7 @@
   const lastMonday = now.addDays(1 - now.getDay())
   export default {
     name: 'calendar-view',
+    props: ['admin'],
     data() {
       return {
         days: [
@@ -165,7 +168,16 @@
           this.unavailabilities.periods = new Map()
             .set(this.days[1].periods[Math.floor(Math.random() * 7)], {reason: 'Special assembly', tierPriority: 2})
             .set(this.days[4].periods[Math.floor(Math.random() * 7)], {reason: 'Calc 2', tierPriority: 0})
+          this.unavailabilities.days = new Map()
+            .set(this.days[0].name, {reason: 'Break', tierPriority: 0})
+            .set(this.days[3].name, {reason: 'Exams', tierPriority: 1})
         }, 500)
+      },
+      isUnavailablePeriod(period) {
+        return this.unavailabilities.periods.has(period)
+      },
+      isUnavailableDay(day) {
+        return this.unavailabilities.days.has(day.name)
       }
     },
     mounted() {
@@ -183,6 +195,6 @@
   .center
     text-align: center
 
-  div.unavailable
-    background: red
+  .unavailable
+    background: #e74c3c !important
 </style>
