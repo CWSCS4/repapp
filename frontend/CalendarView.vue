@@ -1,6 +1,6 @@
 <template>
   <div>
-    <md-toolbar class="md-dense">
+    <md-toolbar class="md-dense" id="week-toolbar">
       <md-button class="md-icon-button" @click.native="lastWeek">
         <md-icon>chevron_left</md-icon>
       </md-button>
@@ -28,7 +28,7 @@
       <md-table-body>
         <md-table-row v-for="index in maxPeriods()">
           <md-table-cell v-for="day in days">
-            <md-card md-with-hover :class="{unavailable: isUnavailablePeriod(day.periods[index - 1])}">
+            <md-card md-with-hover class="full-width" :class="{unavailable: isUnavailablePeriod(day.periods[index - 1])}">
               <md-card-header>
                 <div class="md-title">{{ day.periods[index - 1].period }}</div>
                 <div class="md-subhead">
@@ -192,9 +192,15 @@
 </script>
 
 <style lang="sass" scoped>
+  #week-toolbar
+    justify-content: center
+
   .center
     text-align: center
 
   .unavailable
     background: #e74c3c !important
+
+  .full-width
+    flex-grow: 1
 </style>
