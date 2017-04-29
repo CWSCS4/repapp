@@ -4,7 +4,7 @@ const db = require('../database')
 const router = express.Router()
 
 router.get('/all', function (req, res) {
-  db.link.findAll({attributes: ['college','uuid','scheduledTime','notesFromCollege','notesFromCollegeSeen','lastSignedIn']}).then(links => {
+  db.link.findAll({attributes: ['college','uuid','scheduledTime','periodID','notesFromCollege','notesFromCollegeSeen','lastSignedIn']}).then(links => {
       res.json({success: true, data: links})
   }).catch(function (err){
     res.json({success: false, message: err.message})
@@ -16,7 +16,8 @@ router.post('/', function (req, res) {
   	college: req.body.collegeName,
   	repName: req.body.repName,
   	tierPriority: req.body.tierPriority,
-  	notesToCollege: req.body.toCollege
+  	notesToCollege: req.body.toCollege,
+    notesFromCollegeSeen: true
   }).then(linkObject => {
     res.json({success: true, uuid: linkObject.uuid})
   }).catch(function (err){
@@ -34,14 +35,15 @@ router.delete('/:linkid', function (req, res) {
 
 router.get('/upcoming', function (req, res) {
   db.link.findAll({
-  	attributes: ['college','scheduledTime'],
+  	attributes: ['college','scheduledTime','periodID'],
   	where: {
-      scheduledTime:{$ne:null}
+      scheduledTime:{
+        $ne:null,
+        $gt:new Date()
+      }
     },
     order: '"scheduledTime" ASC'}).then(links => {
-      res.json({success: true, visits: links.filter(function (link){
-        return (new Date(link.scheduledTime[0]) > new Date())
-      })})
+      res.json({success: true, visits:links})
   }).catch(function (err){
     res.json({success: false, message: err.message})
   })
