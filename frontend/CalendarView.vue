@@ -20,26 +20,26 @@
             ({{ mondayDate.addDays(dayIndex).toShortDate() }})
             <md-tooltip md-direction="bottom" v-if="admin && isUnavailableDay(day)">
               Unavailability reason:
-              {{ unavailabilities.days.get(day.name).reason }}
+              {{ unavailabilities.days.get(day.name).reason || 'Unknown' }}
             </md-tooltip>
           </md-table-head>
         </md-table-row>
       </md-table-header>
       <md-table-body>
-        <md-table-row v-for="index in maxPeriods()">
-          <md-table-cell v-for="day in days">
-            <md-card md-with-hover class="full-width" :class="{unavailable: isUnavailablePeriod(day.periods[index - 1])}">
+        <md-table-row v-for="period in periods">
+          <md-table-cell v-for="dayPeriod in period">
+            <md-card md-with-hover class="full-width" v-if="dayPeriod" :class="{unavailable: isUnavailablePeriod(dayPeriod)}">
               <md-card-header>
-                <div class="md-title">{{ day.periods[index - 1].period }}</div>
+                <div class="md-title">{{ dayPeriod.period }}</div>
                 <div class="md-subhead">
-                  {{ day.periods[index - 1].time[0].toHHMM() }}
+                  {{ dayPeriod.time[0].toHHMM() }}
                   -
-                  {{ day.periods[index - 1].time[1].toHHMM() }}
+                  {{ dayPeriod.time[1].toHHMM() }}
                 </div>
               </md-card-header>
-              <md-tooltip md-direction="top" v-if="admin && isUnavailablePeriod(day.periods[index - 1])">
+              <md-tooltip md-direction="top" v-if="admin && isUnavailablePeriod(dayPeriod)">
                 Unavailability reason:
-                {{ unavailabilities.periods.get(day.periods[index - 1]).reason }}
+                {{ getUnavailableReason(dayPeriod) }}
               </md-tooltip>
             </md-card>
           </md-table-cell>
@@ -143,7 +143,7 @@
         loading: false
       }
     },
-    methods: {
+    computed: {
       maxPeriods() {
         let max
         for (const day of this.days) {
@@ -152,6 +152,19 @@
         }
         return max
       },
+      periods() {
+        const periods = []
+        for (let day = 0; day < this.days.length; day++) {
+          for (let period = 0; period < this.days[day].periods.length; period++) {
+            if (!periods[period]) periods[period] = []
+            periods[period][day] = this.days[day].periods[period]
+            periods[period][day].day = this.days[day]
+          }
+        }
+        return periods
+      }
+    },
+    methods: {
       lastWeek() {
         this.mondayDate = this.mondayDate.addDays(-7)
       },
@@ -170,14 +183,23 @@
             .set(this.days[4].periods[Math.floor(Math.random() * 7)], {reason: 'Calc 2', tierPriority: 0})
           this.unavailabilities.days = new Map()
             .set(this.days[0].name, {reason: 'Break', tierPriority: 0})
-            .set(this.days[3].name, {reason: 'Exams', tierPriority: 1})
+            .set(this.days[3].name, {tierPriority: 1})
         }, 500)
       },
       isUnavailablePeriod(period) {
-        return this.unavailabilities.periods.has(period)
+        return (
+          this.unavailabilities.periods.has(period) ||
+          this.unavailabilities.days.has(period.day.name)
+        )
       },
       isUnavailableDay(day) {
         return this.unavailabilities.days.has(day.name)
+      },
+      getUnavailableReason(period) {
+        return (
+          this.unavailabilities.periods.get(period) ||
+          this.unavailabilities.days.get(period.day.name)
+        ).reason || 'Unknown'
       }
     },
     mounted() {
