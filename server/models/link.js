@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       allowNull: false
     },
-    scheduledTime: DataTypes.DATEONLY,
+    scheduledDate: DataTypes.DATEONLY,
     notesToCollege: DataTypes.TEXT,
     notesFromCollege: DataTypes.TEXT,
     notesFromCollegeSeen: DataTypes.BOOLEAN,

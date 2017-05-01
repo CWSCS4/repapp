@@ -6,12 +6,15 @@ const unavailabilitiesRouter = require('./unavailabilities')
 
 const router = express.Router()
 router.use((req, res, next) => {
-    db.link.findOne({where: {
-        uuid: req.linkId 
-    }}).then(link => {
+    db.link.findOne({
+        include:{model: db.period, attributes: ['day','period','start','end']},
+        where: {uuid: req.linkId }}).then(link => {
         if (link === null) {
             console.log(req.linkId)
             throw new Error('Requested link does not exist')
+        }
+        if (!req.session.admin) {
+            db.link.update({lastSignedIn:new Date()},{where:{uuid:link.uuid}})
         }
         req.link = link
         next()
