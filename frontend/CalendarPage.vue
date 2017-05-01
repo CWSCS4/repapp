@@ -1,10 +1,10 @@
 <template>
-  <md-layout md-gutter="8">
+  <md-layout>
     <md-layout md-flex="80">
-      <calendar-view admin="true"></calendar-view>
+      <calendar-view admin="true" class="fill-container"></calendar-view>
     </md-layout>
     <md-layout>
-      <upcoming-view></upcoming-view>
+      <upcoming-view class="fill-container"></upcoming-view>
     </md-layout>
   </md-layout>
 </template>
@@ -21,3 +21,8 @@
     }
   }
 </script>
+
+<style lang="sass" scoped>
+  .fill-container
+    flex-grow: 1
+</style>

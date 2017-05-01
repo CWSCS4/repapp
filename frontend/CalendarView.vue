@@ -27,7 +27,7 @@
       </md-table-header>
       <md-table-body>
         <md-table-row v-for="period in periods">
-          <md-table-cell v-for="dayPeriod in period">
+          <md-table-cell class="less-padding" v-for="dayPeriod in period">
             <md-card md-with-hover class="full-width" v-if="dayPeriod"
               :class="{
                 unavailable: isUnavailablePeriod(dayPeriod),
@@ -241,4 +241,8 @@
 
   .full-width
     flex-grow: 1
+</style>
+<style lang="sass">
+  .less-padding > .md-table-cell-container
+    padding: 6px !important
 </style>
