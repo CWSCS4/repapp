@@ -33,6 +33,7 @@
                 unavailable: isUnavailablePeriod(dayPeriod),
                 visiting: visits.has(dayPeriod)
               }"
+              @click.native="openUnavailableForm(dayPeriod)"
             >
               <md-card-header>
                 <div class="md-title">{{ dayPeriod.period }}</div>
@@ -55,6 +56,16 @@
         </md-table-row>
       </md-table-body>
     </md-table>
+    <md-dialog ref="unavailableForm">
+      <md-dialog-title>Edit unavailability</md-dialog-title>
+      <md-dialog-content>
+        <md-checkbox v-model="unavailableForm.unavailable">Unavailable</md-checkbox>
+        <md-input-container>
+          <label>Reason</label>
+          <md-input v-model="unavailableForm.reason"></md-input>
+        </md-input-container>
+      </md-dialog-content>
+    </md-dialog>
   </div>
 </template>
 
@@ -77,6 +88,13 @@
   const makeTime = (hour, minute) =>
     new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute)
   const lastMonday = now.addDays(1 - now.getDay())
+  function emptyUnavailableForm() {
+    return {
+      unavailable: true,
+      reason: ''
+    }
+  }
+
   export default {
     name: 'calendar-view',
     props: ['admin'],
@@ -150,7 +168,8 @@
           periods: new Map
         },
         visits: new Map,
-        loading: false
+        loading: false,
+        unavailableForm: emptyUnavailableForm()
       }
     },
     computed: {
@@ -213,6 +232,14 @@
           this.unavailabilities.periods.get(period) ||
           this.unavailabilities.days.get(period.day.name)
         ).reason || 'Unknown'
+      },
+      openUnavailableForm(period) {
+        this.unavailableForm = emptyUnavailableForm()
+        if (this.isUnavailablePeriod(period)) {
+          this.unavailableForm.reason = this.getUnavailableReason(period)
+        }
+        this.unavailableForm.period = period
+        this.$refs.unavailableForm.open()
       }
     },
     mounted() {
