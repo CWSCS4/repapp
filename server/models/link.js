@@ -19,12 +19,9 @@ module.exports = (sequelize, DataTypes) => {
   },
   {
     classMethods: {
-      associate({tier}) {
-        // adds a tierPriority field to links table
-        Link.belongsTo(tier)
-      },
-      associate({period}) {
-        Link.belongsTo(period)
+      associate: function(models) {
+        Link.belongsTo(models.tier)
+        Link.belongsTo(models.period)
       }
     }
   })
