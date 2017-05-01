@@ -4,16 +4,18 @@
       <h2 class="md-title">Upcoming</h2>
       <md-spinner md-indeterminate md-size="40" class="md-accent" v-if="loading"></md-spinner>
     </md-toolbar>
-    <md-list>
-      <md-list-item v-for="visit in upcoming">
-        <md-icon>event_available</md-icon>
-        <span>
-          {{ visit.college }}
-          -
-          {{ visit.scheduledTimeStart.toUpcomingString() }}
-        </span>
-      </md-list-item>
-    </md-list>
+    <md-whiteframe md-elevation="2">
+      <md-list>
+        <md-list-item v-for="visit in upcoming">
+          <md-icon>event_available</md-icon>
+          <span>
+            {{ visit.college }}
+            -
+            {{ visit.scheduledTimeStart.toUpcomingString() }}
+          </span>
+        </md-list-item>
+      </md-list>
+    </md-whiteframe>
   </div>
 </template>
 

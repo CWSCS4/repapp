@@ -15,7 +15,10 @@
     <md-table>
       <md-table-header>
         <md-table-row>
-          <md-table-head class="center" v-for="(day, dayIndex) in days" :class="{unavailable: isUnavailableDay(day)}">
+          <md-table-head class="center" v-for="(day, dayIndex) in days"
+            :class="{unavailable: isUnavailableDay(day)}"
+            @click.native="openUnavailableForm({day})"
+          >
             {{ day.name }}
             ({{ mondayDate.addDays(dayIndex).toShortDate() }})
             <md-tooltip md-direction="bottom" v-if="admin && isUnavailableDay(day)">
@@ -33,7 +36,7 @@
                 unavailable: isUnavailablePeriod(dayPeriod),
                 visiting: visits.has(dayPeriod)
               }"
-              @click.native="openUnavailableForm(dayPeriod)"
+              @click.native="openUnavailableForm({period: dayPeriod})"
             >
               <md-card-header>
                 <div class="md-title">{{ dayPeriod.period }}</div>
@@ -62,9 +65,22 @@
         <md-checkbox v-model="unavailableForm.unavailable">Unavailable</md-checkbox>
         <md-input-container>
           <label>Reason</label>
-          <md-input v-model="unavailableForm.reason"></md-input>
+          <md-input v-model="unavailableForm.reason" :disabled="!unavailableForm.unavailable"></md-input>
+        </md-input-container>
+        <md-input-container>
+          <label>Tier</label>
+          <md-select required v-model="unavailableForm.tier">
+            <md-option v-for="tier in tiers" :value="tier.priority">
+              {{ tier.description }}
+            </md-option>
+          </md-select>
         </md-input-container>
       </md-dialog-content>
+      <md-dialog-actions>
+        <md-spinner md-indeterminate v-show="unavailableForm.waitingForSubmit"></md-spinner>
+        <md-button class="md-primary" @click.native="closeUnavailableForm">Cancel</md-button>
+        <md-button class="md-primary" @click.native="createUnavailability">Create</md-button>
+      </md-dialog-actions>
     </md-dialog>
   </div>
 </template>
@@ -91,7 +107,9 @@
   function emptyUnavailableForm() {
     return {
       unavailable: true,
-      reason: ''
+      reason: '',
+      waitingForSubmit: false,
+      tier: null
     }
   }
 
@@ -169,7 +187,8 @@
         },
         visits: new Map,
         loading: false,
-        unavailableForm: emptyUnavailableForm()
+        unavailableForm: emptyUnavailableForm(),
+        tiers: []
       }
     },
     computed: {
@@ -233,17 +252,43 @@
           this.unavailabilities.days.get(period.day.name)
         ).reason || 'Unknown'
       },
-      openUnavailableForm(period) {
+      openUnavailableForm({period, day}) {
         this.unavailableForm = emptyUnavailableForm()
-        if (this.isUnavailablePeriod(period)) {
+        if (period && this.unavailabilities.periods.has(period)) {
           this.unavailableForm.reason = this.getUnavailableReason(period)
+          this.unavailableForm.tier = this.unavailabilities.periods.get(period).tierPriority
         }
-        this.unavailableForm.period = period
+        else if (day && this.isUnavailableDay(day)) {
+          this.unavailableForm.reason = this.unavailabilities.days.get(day.name).reason
+          this.unavailableForm.tier = this.unavailabilities.days.get(day.name).tierPriority
+        }
+        else this.unavailableForm.tier = this.tiers[0].priority
+        this.unavailableForm.target = {period, day}
         this.$refs.unavailableForm.open()
+      },
+      closeUnavailableForm() {
+        this.$refs.unavailableForm.close()
+      },
+      createUnavailability() {
+        this.unavailableForm.waitingForSubmit = true
+        setTimeout(() => { //will eventually actually send a request, so we simulate it here
+          this.closeUnavailableForm()
+          this.unavailableForm.waitingForSubmit = false
+        }, 1000)
+      },
+      getTiers() {
+        setTimeout(() => { //will eventually be populated from a request
+          this.tiers = [
+            {priority: 0, description: 'Unavailable'},
+            {priority: 1, description: 'High'},
+            {priority: 2, description: 'Low'}
+          ]
+        }, 500)
       }
     },
     mounted() {
       this.getUnavailabilities()
+      this.getTiers()
     },
     watch: {
       mondayDate() {

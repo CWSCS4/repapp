@@ -72,7 +72,7 @@
           <md-input-container>
             <label>Tier</label>
             <md-select required v-model="linkForm.tier">
-              <md-option v-for="tier in tiers" v-bind:value="tier.priority">
+              <md-option v-for="tier in tiers" :value="tier.priority">
                 {{ tier.description }}
               </md-option>
             </md-select>
