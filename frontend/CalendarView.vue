@@ -69,7 +69,7 @@
         </md-input-container>
         <md-input-container>
           <label>Tier</label>
-          <md-select required v-model="unavailableForm.tier">
+          <md-select required v-model="unavailableForm.tier" :disabled="!unavailableForm.unavailable">
             <md-option v-for="tier in tiers" :value="tier.priority">
               {{ tier.description }}
             </md-option>
@@ -79,13 +79,17 @@
       <md-dialog-actions>
         <md-spinner md-indeterminate v-show="unavailableForm.waitingForSubmit"></md-spinner>
         <md-button class="md-primary" @click.native="closeUnavailableForm">Cancel</md-button>
-        <md-button class="md-primary" @click.native="createUnavailability">Create</md-button>
+        <md-button class="md-primary" @click.native="updateUnavailability">Update</md-button>
       </md-dialog-actions>
     </md-dialog>
   </div>
 </template>
 
 <script>
+  function addZero(num) {
+    if (num < 10) return '0' + String(num)
+    return String(num)
+  }
   Date.prototype.addDays = function(days) {
     return new Date(this.getTime() + 86400000 * days)
   }
@@ -93,8 +97,7 @@
     return (
       String((this.getHours() + 11) % 12 + 1) +
       ':' +
-      (this.getMinutes() < 10 ? '0' : '') +
-      String(this.getMinutes())
+      addZero(this.getMinutes())
     )
   }
   Date.prototype.toShortDate = function() {
@@ -254,11 +257,17 @@
       },
       openUnavailableForm({period, day}) {
         this.unavailableForm = emptyUnavailableForm()
-        if (period && this.unavailabilities.periods.has(period)) {
-          this.unavailableForm.reason = this.getUnavailableReason(period)
-          this.unavailableForm.tier = this.unavailabilities.periods.get(period).tierPriority
+        if (period) {
+          if (this.unavailabilities.periods.has(period)) {
+            this.unavailableForm.reason = this.getUnavailableReason(period)
+            this.unavailableForm.tier = this.unavailabilities.periods.get(period).tierPriority
+          }
+          else {
+            ({day} = period)
+            period = null
+          }
         }
-        else if (day && this.isUnavailableDay(day)) {
+        if (day && this.isUnavailableDay(day)) {
           this.unavailableForm.reason = this.unavailabilities.days.get(day.name).reason
           this.unavailableForm.tier = this.unavailabilities.days.get(day.name).tierPriority
         }
@@ -269,7 +278,7 @@
       closeUnavailableForm() {
         this.$refs.unavailableForm.close()
       },
-      createUnavailability() {
+      updateUnavailability() {
         this.unavailableForm.waitingForSubmit = true
         setTimeout(() => { //will eventually actually send a request, so we simulate it here
           this.closeUnavailableForm()

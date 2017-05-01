@@ -8,11 +8,11 @@
       <md-list>
         <md-list-item v-for="visit in upcoming">
           <md-icon>event_available</md-icon>
-          <span>
+          <a :href="'/' + visit.uuid">
             {{ visit.college }}
             -
             {{ visit.scheduledTimeStart.toUpcomingString() }}
-          </span>
+          </a>
         </md-list-item>
       </md-list>
     </md-whiteframe>
@@ -49,11 +49,11 @@
       setTimeout(() => {
         this.loading = false
         this.upcoming = [
-          {college: 'NYU', scheduledTimeStart: new Date(2017, 4,  5, 10, 25)},
-          {college: 'CMU', scheduledTimeStart: new Date(2017, 4,  8,  8, 30)},
-          {college: 'USC', scheduledTimeStart: new Date(2017, 4,  9, 11, 35)},
-          {college: 'MIT', scheduledTimeStart: new Date(2017, 4, 11,  3, 25)},
-          {college: 'LSU', scheduledTimeStart: new Date(2017, 4, 12,  2,  5)}
+          {college: 'NYU', uuid: '123456', scheduledTimeStart: new Date(2017, 4,  5, 10, 25)},
+          {college: 'CMU', uuid: '234561', scheduledTimeStart: new Date(2017, 4,  8,  8, 30)},
+          {college: 'USC', uuid: '345612', scheduledTimeStart: new Date(2017, 4,  9, 11, 35)},
+          {college: 'MIT', uuid: '456123', scheduledTimeStart: new Date(2017, 4, 11,  3, 25)},
+          {college: 'LSU', uuid: '561234', scheduledTimeStart: new Date(2017, 4, 12,  2,  5)}
         ]
       }, 500)
     }
