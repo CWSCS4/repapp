@@ -13,6 +13,9 @@ router.use((req, res, next) => {
             console.log(req.linkId)
             throw new Error('Requested link does not exist')
         }
+        if (!req.session.admin) {
+            db.link.update({lastSignedIn:new Date()},{where:{uuid:link.uuid}})
+        }
         req.link = link
         next()
     }).catch(error => {
