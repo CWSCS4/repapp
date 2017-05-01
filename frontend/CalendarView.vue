@@ -28,7 +28,12 @@
       <md-table-body>
         <md-table-row v-for="period in periods">
           <md-table-cell v-for="dayPeriod in period">
-            <md-card md-with-hover class="full-width" v-if="dayPeriod" :class="{unavailable: isUnavailablePeriod(dayPeriod)}">
+            <md-card md-with-hover class="full-width" v-if="dayPeriod"
+              :class="{
+                unavailable: isUnavailablePeriod(dayPeriod),
+                visiting: visits.has(dayPeriod)
+              }"
+            >
               <md-card-header>
                 <div class="md-title">{{ dayPeriod.period }}</div>
                 <div class="md-subhead">
@@ -40,6 +45,10 @@
               <md-tooltip md-direction="top" v-if="admin && isUnavailablePeriod(dayPeriod)">
                 Unavailability reason:
                 {{ getUnavailableReason(dayPeriod) }}
+              </md-tooltip>
+              <md-tooltip md-direction="top" v-if="admin && visits.has(dayPeriod)">
+                College:
+                {{ visits.get(dayPeriod) }}
               </md-tooltip>
             </md-card>
           </md-table-cell>
@@ -140,6 +149,7 @@
           days: new Map,
           periods: new Map
         },
+        visits: new Map,
         loading: false
       }
     },
@@ -184,6 +194,9 @@
           this.unavailabilities.days = new Map()
             .set(this.days[0].name, {reason: 'Break', tierPriority: 0})
             .set(this.days[3].name, {tierPriority: 1})
+          this.visits = new Map()
+            .set(this.days[2].periods[1], 'University of Toronto')
+            .set(this.days[2].periods[5], 'Swarthmore')
         }, 500)
       },
       isUnavailablePeriod(period) {
@@ -222,6 +235,9 @@
 
   .unavailable
     background: #e74c3c !important
+
+  .visiting
+    background: #f1c40f !important
 
   .full-width
     flex-grow: 1
