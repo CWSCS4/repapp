@@ -26,13 +26,4 @@ router.use(express.static('public'))
 
 router.use(bodyParser.json())
 
-
-/*router.get('/temp/:linkid', function (req, res) {
-  db.link.update({scheduledTime: ["2017-04-23 15:52:10.458000", "2017-04-23 15:54:10.458000"]},{where: {uuid:req.params.linkid} }).then(link => {
-      res.json({success: true})
-  }).catch(function (err){
-    res.json({success: false, message: err.message})
-  })
-})*/
-
 module.exports = router

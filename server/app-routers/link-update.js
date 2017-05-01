@@ -6,7 +6,7 @@ const router = express.Router()
 router.post('/visit', function (req, res) {
   db.link.update({
     periodId:req.body.period,
-    scheduledTime:req.body.day
+    scheduledDate:req.body.date
   },{where: {uuid:req.link.uuid} }).then(link => {
       res.json({success: true})
   }).catch(function (err){

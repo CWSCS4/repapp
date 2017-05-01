@@ -4,7 +4,7 @@ const db = require('../database')
 const router = express.Router()
 
 router.get('/all', function (req, res) {
-  db.link.findAll({attributes: ['college','uuid','scheduledTime','periodID','notesFromCollege','notesFromCollegeSeen','lastSignedIn']}).then(links => {
+  db.link.findAll({include:{model: db.period, attributes: ['day','period','start','end']}, attributes: ['college','uuid','scheduledDate','periodId','notesFromCollege','notesFromCollegeSeen','lastSignedIn']}).then(links => {
       res.json({success: true, data: links})
   }).catch(function (err){
     res.json({success: false, message: err.message})
@@ -35,14 +35,15 @@ router.delete('/:linkid', function (req, res) {
 
 router.get('/upcoming', function (req, res) {
   db.link.findAll({
-  	attributes: ['college','scheduledTime','periodID'],
+    include:{model: db.period, attributes: ['day','period','start','end']},
+  	attributes: ['college','scheduledDate','periodId'],
   	where: {
-      scheduledTime:{
+      scheduledDate:{
         $ne:null,
         $gt:new Date()
       }
     },
-    order: '"scheduledTime" ASC'}).then(links => {
+    order: '"scheduledDate" ASC'}).then(links => {
       res.json({success: true, visits:links})
   }).catch(function (err){
     res.json({success: false, message: err.message})
