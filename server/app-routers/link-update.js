@@ -41,7 +41,7 @@ router.post('/repName', function (req, res) {
 })
 
 router.get('/read-notes', function (req, res) {
-  db.link.update({notesFromCollegeSeen: true},{where: {uuid:req.params.linkid} }).then(link => {
+  db.link.update({notesFromCollegeSeen: true},{where: {uuid:req.link.uuid} }).then(link => {
       res.json({success: true})
   }).catch(function (err){
     res.json({success: false, message: err.message})
