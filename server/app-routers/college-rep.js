@@ -10,11 +10,7 @@ router.use((req, res, next) => {
         include:{model: db.period, attributes: ['day','period','start','end']},
         where: {uuid: req.linkId }}).then(link => {
         if (link === null) {
-            console.log(req.linkId)
-            throw new Error('Requested link does not exist')
-        }
-        if (!req.session.admin) {
-            db.link.update({lastSignedIn:new Date()},{where:{uuid:link.uuid}})
+            throw new Error('Requested link does not exist: ' + req.linkId)
         }
         req.link = link
         next()
