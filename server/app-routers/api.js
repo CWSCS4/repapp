@@ -10,20 +10,14 @@ const router = express.Router()
 router.use(bodyParser.json())
 
 router.use('/login', loginRouter)
-//router.use('/admin', restrictToLoggedIn, adminRouter)
+// TODO: Once login frontend is complete, uncomment:
+// router.use('/admin', restrictToLoggedIn, adminRouter)
 router.use('/admin', adminRouter)
 
 // API calls college reps need
 router.use('/:linkId', (req, res, next) => {
   req.linkId = req.params.linkId
   next()
-},
-collegeRepRouter)
-
-// This address is relative to where the node process is started.
-router.use(express.static('public'))
-
-
-router.use(bodyParser.json())
+}, collegeRepRouter)
 
 module.exports = router
