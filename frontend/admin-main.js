@@ -12,7 +12,7 @@ Vue.use(VueRouter)
 
 const routes = [
   {path: '/admin', redirect: '/admin/calendar'},
-  { path: '/admin/calendar', component: CalendarPage},
+  {path: '/admin/calendar', component: CalendarPage},
   {path: '/admin/links', component: LinksView},
   {path: '/admin/settings', component: SettingsView}
 ]
