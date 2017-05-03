@@ -1,6 +1,6 @@
 <template>
   <div>
-    <md-toolbar class="md-warn">
+    <md-toolbar class="md-accent">
       <h2 class="md-title">Upcoming</h2>
       <md-spinner md-indeterminate md-size="40" class="md-accent" v-if="loading"></md-spinner>
     </md-toolbar>
@@ -31,7 +31,7 @@
       ' ' +
       String(this.getDate()) +
       ' at ' +
-      String(this.getHours()) +
+      String((this.getHours() + 11) % 12 + 1) +
       ':' +
       addZero(this.getMinutes())
     )
@@ -52,8 +52,8 @@
           {college: 'NYU', uuid: '123456', scheduledTimeStart: new Date(2017, 4,  5, 10, 25)},
           {college: 'CMU', uuid: '234561', scheduledTimeStart: new Date(2017, 4,  8,  8, 30)},
           {college: 'USC', uuid: '345612', scheduledTimeStart: new Date(2017, 4,  9, 11, 35)},
-          {college: 'MIT', uuid: '456123', scheduledTimeStart: new Date(2017, 4, 11,  3, 25)},
-          {college: 'LSU', uuid: '561234', scheduledTimeStart: new Date(2017, 4, 12,  2,  5)}
+          {college: 'MIT', uuid: '456123', scheduledTimeStart: new Date(2017, 4, 11, 15, 25)},
+          {college: 'LSU', uuid: '561234', scheduledTimeStart: new Date(2017, 4, 12, 14,  5)}
         ]
       }, 500)
     }
