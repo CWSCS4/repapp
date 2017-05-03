@@ -25,8 +25,16 @@ router.post('/', function (req, res) {
   })
 })
 
-router.delete('/:linkid', function (req, res) {
-  db.link.destroy({where: {uuid:req.params.linkid} }).then(link => {
+router.delete('/:linkId', function (req, res) {
+  db.link.destroy({where: {uuid:req.params.linkId} }).then(link => {
+      res.json({success: true})
+  }).catch(function (err){
+    res.json({success: false, message: err.message})
+  })
+})
+
+router.get('/read-notes/:linkId', function (req, res) {
+  db.link.update({notesFromCollegeSeen: true}, {where: {uuid:req.params.linkId} }).then(link => {
       res.json({success: true})
   }).catch(function (err){
     res.json({success: false, message: err.message})
@@ -35,8 +43,8 @@ router.delete('/:linkid', function (req, res) {
 
 router.get('/upcoming', function (req, res) {
   db.link.findAll({
-    include:{model: db.period, attributes: ['day','period','start','end']},
-  	attributes: ['college','scheduledDate','periodId'],
+    include:{model: db.period, attributes: ['day', 'period', 'start', 'end']},
+  	attributes: ['college', 'scheduledDate', 'periodId'],
   	where: {
       scheduledDate:{
         $ne:null,
