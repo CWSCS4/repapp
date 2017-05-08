@@ -76,7 +76,7 @@
           <md-input-container>
             <label>Tier</label>
             <md-select required v-model="linkForm.tier">
-              <md-option v-for="tier in tiers" v-bind:value="tier.priority">
+              <md-option v-for="tier in tiers" :value="tier.priority">
                 {{ tier.description }}
               </md-option>
             </md-select>
@@ -158,7 +158,7 @@
           .then(response => response.json())
           .then(({success, message, links}) => {
             if (success) this.links = links.map(link => new Link(link))
-            else alert(message)
+            else this.$router.push('/admin/login')
           })
       },
       getTiers() {
@@ -180,7 +180,7 @@
         fetch('/api/admin/link/read-notes/' + link.uuid, {credentials: 'include'})
           .then(response => response.json())
           .then(({success, message}) => {
-            if (!success) alert(message)
+            if (!success) this.$router.push('/admin/login')
           })
       },
       openLinkForm() {
@@ -219,7 +219,7 @@
               this.linkForm = emptyLinkForm(this.tiers)
               this.refreshLinks()
             }
-            else alert(message)
+            else this.$router.push('/admin/login')
           })
         this.waitingForLink = true
       },
@@ -232,7 +232,7 @@
           .then(response => response.json())
           .then(({success, message}) => {
             if (success) this.links.splice(index, 1)
-            else alert(message)
+            else this.$router.push('/admin/login')
           })
       }
     },
