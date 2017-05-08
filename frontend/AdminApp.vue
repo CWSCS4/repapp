@@ -38,22 +38,17 @@
     </md-sidenav>
 
     <router-view></router-view>
-
-    <admin-login></admin-login>
   </div>
 </template>
 
 <script>
-  import AdminLogin from './AdminLogin.vue'
-
   export default {
     name: 'admin-app',
     methods: {
       toggleSidebar() {
         this.$refs.sidebar.toggle()
       }
-    },
-    components: {AdminLogin}
+    }
   }
 </script>
 

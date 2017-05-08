@@ -61,19 +61,24 @@
             if (success) {
               this.loggedIn = true
               this.$refs.login.close()
+              this.redirectAfterLogIn()
             }
             else {
               this.loginError = message
               this.$refs.loginError.open()
             }
           })
+      },
+      redirectAfterLogIn() {
+        this.$router.push('/admin/calendar')
       }
     },
     mounted() {
       fetch('/api/logged-in', {credentials: 'include'})
         .then(response => response.json())
         .then(({success, loggedIn}) => {
-          if (!(success && loggedIn)) this.openLogIn(false)
+          if (success && loggedIn) this.redirectAfterLogIn()
+          else this.openLogIn(false)
         })
     }
   }
