@@ -6,6 +6,6 @@ const adminUnavailabilitiesRouter = require('./admin-unavailabilities')
 const router = express.Router()
 router.use('/link', adminLinksRouter)
 router.use(adminSettingsRouter)
-router.use(adminUnavailabilitiesRouter)
+router.use('/unavailabilities',adminUnavailabilitiesRouter)
 
 module.exports = router
