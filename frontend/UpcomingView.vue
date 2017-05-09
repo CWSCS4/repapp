@@ -20,6 +20,8 @@
 </template>
 
 <script>
+  import adminFetch from './admin-fetch'
+
   function addZero(num) {
     if (num < 10) return '0' + String(num)
     return String(num)
@@ -46,16 +48,18 @@
       }
     },
     mounted() {
-      setTimeout(() => {
-        this.loading = false
-        this.upcoming = [
-          {college: 'NYU', uuid: '123456', scheduledTimeStart: new Date(2017, 4,  5, 10, 25)},
-          {college: 'CMU', uuid: '234561', scheduledTimeStart: new Date(2017, 4,  8,  8, 30)},
-          {college: 'USC', uuid: '345612', scheduledTimeStart: new Date(2017, 4,  9, 11, 35)},
-          {college: 'MIT', uuid: '456123', scheduledTimeStart: new Date(2017, 4, 11, 15, 25)},
-          {college: 'LSU', uuid: '561234', scheduledTimeStart: new Date(2017, 4, 12, 14,  5)}
-        ]
-      }, 500)
+      adminFetch({
+        url: '/api/admin/link/upcoming',
+        handler: ({visits}) => {
+          this.upcoming = visits.map(({college, period: {start}, scheduledDate, uuid}) => {
+            const [hour, minute] = start.split(':').map(Number)
+            scheduledDate = new Date(scheduledDate)
+            const scheduledTimeStart = new Date(scheduledDate.getFullYear(), scheduledDate.getMonth(), scheduledDate.getDate(), hour, minute)
+            return {college, uuid, scheduledTimeStart}
+          })
+        },
+        router: this.$router
+      })
     }
   }
 </script>
