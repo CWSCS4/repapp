@@ -7,7 +7,7 @@ router.get('/:day', function (req, res){
 	db.unavailable_day.findAll({
 	    where:
 	      {day:
-	        {$gt: new Date(req.params.day),
+	        {$gte: new Date(req.params.day),
 	        $lt:  new Date((new Date(req.params.day)).getTime() + 7 * 24 * 60 * 60 * 1000)}
 	      },
 	    order: '"day" ASC',
@@ -17,19 +17,42 @@ router.get('/:day', function (req, res){
 		    where:
 		      {$or:[
 		        {day:
-		        {$gt: new Date(req.params.day),
+		        {$gte: new Date(req.params.day),
 		        $lt:  new Date((new Date(req.params.day)).getTime() + 7 * 24 * 60 * 60 * 1000)}},
-		        {repeatWeekly: true}]
+		        {$and:
+	              {repeatWeekly: true,
+	                $or:[
+	                  {repeatEnd:
+	                    {
+	                      $gte:new Date(req.params.day)
+	                    }
+	                  },
+	                  {repeatEnd:null}
+	                ]
+	              }
+	            }]
 		      },
 		    order: '"day" ASC',
 		    include:{model: db.period, attributes: ['day','period','start','end']},
-		    attributes: ['day','reason','periodId','repeatWeekly']
+		    attributes: ['day','reason','periodId','repeatWeekly','repeatEnd']
 	    })]
 	  }
 	).spread( function ( unavailable_days, unavailable_periods) {
 		res.json({success : true, days : unavailable_days, periods : unavailable_periods})
 	})
   .catch(function (err){
+      res.json({success: false, message: err.message})
+  })
+})
+
+router.post('/day', function (req, res){
+	db.unavailable_days.create({
+		day:req.body.day,
+		tierPriority:req.body.tier,
+		reason:req.body.reason
+	}).then ( function ( unavailable_day ) {
+		res.json({success : true})
+	}).catch(function (err){
       res.json({success: false, message: err.message})
   })
 })
