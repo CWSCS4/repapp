@@ -7,7 +7,7 @@ const restrictToLoggedIn = require('../restrict-to-logged-in')
 const router = express.Router()
 router.use(restrictToLoggedIn)
 router.use('/link', adminLinksRouter)
-router.use(adminSettingsRouter)
+router.use('/settings', adminSettingsRouter)
 router.use(adminUnavailabilitiesRouter)
 
 module.exports = router
