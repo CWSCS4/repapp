@@ -1,6 +1,7 @@
 <template>
   <div>
-    <md-checkbox v-model="checked">{{ label }}</md-checkbox>
+    <md-checkbox v-model="checked" :disabled="loading">{{ label }}</md-checkbox>
+    <md-spinner md-indeterminate md-size="30" class="md-accent" v-show="loading"></md-spinner>
   </div>
 </template>
 
@@ -12,19 +13,21 @@
     props: ['setting', 'on', 'label'],
     data() {
       return {
-        checked: this.on
+        checked: this.on,
+        loading: false
       }
     },
     watch: {
       checked() {
+        this.loading = true
         adminFetch({
           url: '/api/admin/settings/set',
           data: {
             setting: this.setting,
             on: this.checked
           },
-          handler() {
-
+          handler: () => {
+            this.loading = false
           },
           router: this.$router
         })
