@@ -70,7 +70,8 @@ router.get('/upcoming', (req, res) => {
     order: [
       'scheduledDate',
       [Period, 'start']
-    ]
+    ],
+    limit: 10
   })
     .then(visits => res.json({success: true, visits}))
     .catch(respondWithError(res))
