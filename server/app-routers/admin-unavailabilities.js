@@ -46,15 +46,31 @@ router.get('/:day', function (req, res){
 })
 
 router.post('/day', function (req, res){
-	db.unavailable_days.create({
+		req.body.day.forEach( function (day) {
+			db.unavailable_days.create({
+				day:day,
+				tierPriority:req.body.tier,
+				reason:req.body.reason
+			}).catch(function (err){
+		      res.json({success: false, message: err.message})
+			})
+		})
+		res.json({success: true})
+})
+
+router.post('/period', function (req, res){
+	db.unavailable_periods.create({
+		repeatWeekly:req.body.repeatWeekly,
+		repeatEnd: req.body.repeatEnd,
+		periodId: req.body.period,
 		day:req.body.day,
 		tierPriority:req.body.tier,
 		reason:req.body.reason
-	}).then ( function ( unavailable_day ) {
+	}).then ( function ( unavailable_period ) {
 		res.json({success : true})
 	}).catch(function (err){
       res.json({success: false, message: err.message})
-  })
+  	})
 })
 
 module.exports = router
