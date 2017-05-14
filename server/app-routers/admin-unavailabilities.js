@@ -46,8 +46,9 @@ router.get('/:day', function (req, res){
 })
 
 router.post('/day', function (req, res){
-		req.body.day.forEach( function (day) {
-			db.unavailable_days.create({
+	console.log(req.body.days)
+		req.body.days.forEach( function (day) {
+			db.unavailable_day.create({
 				day:day,
 				tierPriority:req.body.tier,
 				reason:req.body.reason
@@ -59,7 +60,7 @@ router.post('/day', function (req, res){
 })
 
 router.post('/period', function (req, res){
-	db.unavailable_periods.create({
+	db.unavailable_period.create({
 		repeatWeekly:req.body.repeatWeekly,
 		repeatEnd: req.body.repeatEnd,
 		periodId: req.body.period,
