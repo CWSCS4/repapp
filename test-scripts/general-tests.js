@@ -1,7 +1,7 @@
 const db = require('../server/database')
 const request = require('request')
 
-db.link.create({college: "UMass"})
+/*db.link.create({college: "UMass"})
 
 db.tier.create({priority:0, description:"Base unavailability"})
 
@@ -22,7 +22,6 @@ request.post(
   }
 )
 
-
 request.post(
   'http://localhost:8000/api/admin/unavailabilities/day',
   { json: {
@@ -37,3 +36,25 @@ request.post(
       else {console.log(error)}
   }
 )
+
+request.post(
+  'http://localhost:8000/api/admin/tiers',
+  { json: {
+		priority:1,
+    description: "tier 1"
+	} },
+  function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+          console.log(body)
+      }
+      else {console.log(error)}
+  }
+)
+*/
+request.delete('http://localhost:8000/api/admin/tiers/1',
+function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        console.log(body)
+    }
+    else {console.log(error)}
+})
