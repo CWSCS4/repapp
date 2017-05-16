@@ -64,7 +64,6 @@ router.post('/day', function (req, res) {
 	while (day <= end){
 		dateArray.push(day.toISOString().slice(0,10))
 		day=new Date(day.getTime() + 24 * 60 * 60 * 1000)
-		console.log(day)
 	}
 	Promise.all(dateArray.map( function (day) {
 		db.unavailable_day.create({
