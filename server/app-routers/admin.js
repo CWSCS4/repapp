@@ -5,7 +5,7 @@ const adminUnavailabilitiesRouter = require('./admin-unavailabilities')
 const restrictToLoggedIn = require('../restrict-to-logged-in')
 
 const router = express.Router()
-//router.use(restrictToLoggedIn)
+router.use(restrictToLoggedIn)
 router.use('/link', adminLinksRouter)
 router.use(adminSettingsRouter)
 router.use('/unavailabilities',adminUnavailabilitiesRouter)
