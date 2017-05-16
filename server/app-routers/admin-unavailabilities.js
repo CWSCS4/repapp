@@ -56,14 +56,25 @@ router.get('/:day', function (req, res) {
 		.catch(respondWithError(res))
 })
 
+//[start,end) -- exclusive upper bound
 router.post('/day', function (req, res) {
-	db.unavailable_day.create({
-		day: req.body.day,
-		tierPriority: req.body.tier,
-		reason: req.body.reason
-	})
-		.then(() => res.json({ success: true }))
-		.catch(respondWithError(res))
+	var day = new Date(req.body.start)
+	const end = new Date(req.body.end)
+	var dateArray = []
+	while (day <= end){
+		dateArray.push(day.toISOString().slice(0,10))
+		day=new Date(day.getTime() + 24 * 60 * 60 * 1000)
+		console.log(day)
+	}
+	console.log(dateArray)
+	Promise.all(dateArray.map( function (day) {
+		db.unavailable_day.create({
+			day: day,
+			tierPriority: req.body.tier,
+			reason: req.body.reason
+		})
+	})).then(() => res.json({ success: true }))
+	.catch(respondWithError(res))
 })
 
 router.post('/period', function (req, res) {

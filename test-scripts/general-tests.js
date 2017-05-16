@@ -1,11 +1,11 @@
 const db = require('../server/database')
 const request = require('request')
 
-db.link.create({college: "UMass"})
+//db.link.create({college: "UMass"})
 
-db.tier.create({priority:0, description:"Base unavailability"})
+//db.tier.create({priority:0, description:"Base unavailability"})
 
-request.post(
+/*request.post(
   'http://localhost:8000/api/admin/unavailabilities/period',
   { json: {
 		repeatWeekly:false,
@@ -20,13 +20,14 @@ request.post(
       }
       else {console.log(error)}
   }
-)
+)*/
 
 
 request.post(
   'http://localhost:8000/api/admin/unavailabilities/day',
   { json: {
-		days:[new Date(),new Date("5-15-2017")],
+		start:new Date(),
+    end: new Date("5-27-2017"),
 		tier:0,
 		reason:"Test days entry"
 	} },
