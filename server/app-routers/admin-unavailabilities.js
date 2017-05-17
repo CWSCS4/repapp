@@ -2,9 +2,11 @@ const express = require('express')
 const db = require('../database')
 const respondWithError = require('../respond-with-error')
 const router = express.Router()
+const validatePostParams = require('../validate-post-params')
+const localDate = require('../local-date')
 
 router.get('/:day', function (req, res) {
-	const date = new Date(req.params.day)
+	const date = localDate(req.params.day)
 	const nextWeek = new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000)
 	Promise.all([
 		db.unavailable_day.findAll({
@@ -56,23 +58,24 @@ router.get('/:day', function (req, res) {
 		.catch(respondWithError(res))
 })
 
-//[start,end) -- exclusive upper bound
+//[start,end] -- inclusive upper bound
+router.post('/day', validatePostParams({start: String, end: String, tier: Number}))
 router.post('/day', function (req, res) {
-	let day = new Date(req.body.start)
-	const end = new Date(req.body.end)
+	let day = localDate(req.body.start)
+	const end = localDate(req.body.end)
 	const dateArray = []
-	while (day <= end){
+	while (day <= end) {
 		dateArray.push(day)
-		day=new Date(day.getTime() + 24 * 60 * 60 * 1000)
+		day = new Date(day.getTime() + 24 * 60 * 60 * 1000)
 	}
-	Promise.all(dateArray.map( function (day) {
+	Promise.all(dateArray.map(function (day) {
 		db.unavailable_day.create({
 			day,
 			tierPriority: req.body.tier,
 			reason: req.body.reason
 		})
 	})).then(() => res.json({ success: true }))
-	.catch(respondWithError(res))
+		.catch(respondWithError(res))
 })
 
 router.post('/period', function (req, res) {

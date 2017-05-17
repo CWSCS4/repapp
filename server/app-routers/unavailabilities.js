@@ -1,10 +1,11 @@
 const express = require('express')
 const db = require('../database')
-
+const respondWithError = require('../respond-with-error')
 const router = express.Router()
+const localDate = require('../local-date')
 
 router.get('/:day', function (req, res) {
-	const date = new Date(req.params.day)
+	const date = localDate(req.params.day)
 	const nextWeek = new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000)
 	Promise.all([
 		db.unavailable_day.findAll({
@@ -14,6 +15,9 @@ router.get('/:day', function (req, res) {
 				{
 					$gte: date,
 					$lt: nextWeek
+				},
+				tierPriority: {
+					$lt: req.link.tierPriority
 				}
 			},
 			order: '"day" ASC',
@@ -22,6 +26,9 @@ router.get('/:day', function (req, res) {
 		db.unavailable_period.findAll({
 			where:
 			{
+				tierPriority: {
+					$lt: req.link.tierPriority
+				},
 				$or: [
 					{
 						day:
