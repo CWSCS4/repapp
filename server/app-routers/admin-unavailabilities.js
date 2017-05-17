@@ -58,16 +58,16 @@ router.get('/:day', function (req, res) {
 
 //[start,end) -- exclusive upper bound
 router.post('/day', function (req, res) {
-	var day = new Date(req.body.start)
+	let day = new Date(req.body.start)
 	const end = new Date(req.body.end)
-	var dateArray = []
+	const dateArray = []
 	while (day <= end){
-		dateArray.push(day.toISOString().slice(0,10))
+		dateArray.push(day)
 		day=new Date(day.getTime() + 24 * 60 * 60 * 1000)
 	}
 	Promise.all(dateArray.map( function (day) {
 		db.unavailable_day.create({
-			day: day,
+			day,
 			tierPriority: req.body.tier,
 			reason: req.body.reason
 		})
