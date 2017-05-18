@@ -12,7 +12,7 @@ router.use(adminUnavailabilitiesRouter)
 
 //Catch any failed admin requests to avoid them being treated as link requests with uuid "admin"
 router.use((req, res) => {
-	res.json({success: false, message: 'Unmatched admin API: ' + req.url})
+  res.json({success: false, message: 'Unmatched admin API: ' + req.url})
 })
 
 module.exports = router
