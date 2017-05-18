@@ -26,9 +26,7 @@
             setting: this.setting,
             on: this.checked
           },
-          handler: () => {
-            this.loading = false
-          },
+          handler: () => this.loading = false,
           router: this.$router
         })
       }

@@ -48,5 +48,55 @@ router.post('/set',
       .catch(respondWithError(res))
   }
 )
+router.post('/new-admin',
+  validatePostParams({
+    email: String,
+    password: String
+  }),
+  (req, res) => {
+    const {email, password} = req.body
+    Admin.findOne({
+      where: {
+        email
+      }
+    })
+      .then(admin => {
+        if (admin) throw new Error('Email already in use')
+
+        return Admin.create({
+          email,
+          password,
+          emailOnPeriodChoice: true,
+          emailOnCancellation: true,
+          emailOnNoteChange: true,
+          emailDailyDigest: true
+        })
+          .then(() => res.json({success: true}))
+      })
+      .catch(respondWithError(res))
+  }
+)
+router.get('/admins', (req, res) => {
+  Admin.findAll({
+    attributes: ['email'],
+    where: {
+      email: {
+        $ne: req.session.admin.email //so admins don't accidentally delete themselves
+      }
+    }
+  })
+    .then(admins => {
+      admins = admins.map(admin => admin.email)
+      res.json({success: true, admins})
+    })
+    .catch(respondWithError(res))
+})
+router.delete('/admin/:email', (req, res) => {
+  Admin.destroy({
+    where: {email: req.params.email}
+  })
+    .then(() => res.json({success: true}))
+    .catch(respondWithError(res))
+})
 
 module.exports = router

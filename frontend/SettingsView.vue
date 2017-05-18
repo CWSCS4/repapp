@@ -10,6 +10,14 @@
             <md-button class="md-raised md-accent" @click.native="openAdminForm" id="new-admin">
               <md-icon>add</md-icon>
             </md-button>
+            <md-list>
+              <md-list-item v-for="admin in admins">
+                {{ admin }}
+                <md-button class="md-raised" @click.native="deleteAdmin(admin)">
+                  <md-icon>delete</md-icon>
+                </md-button>
+              </md-list-item>
+            </md-list>
           </md-card-content>
         </md-card>
       </md-layout>
@@ -79,7 +87,8 @@
         },
         emailSettings: null,
         adminForm: emptyAdminForm(),
-        waitingForCreate: false
+        waitingForCreate: false,
+        admins: []
       }
     },
     mounted() {
@@ -88,6 +97,7 @@
         handler: ({settings}) => this.emailSettings = settings,
         router: this.$router
       })
+      this.fetchAdmins()
     },
     methods: {
       openAdminForm() {
@@ -113,6 +123,7 @@
             password: this.adminForm.password
           },
           handler: () => {
+            this.fetchAdmins()
             this.closeAdminForm()
             this.waitingForCreate = false
             this.adminForm = emptyAdminForm()
@@ -120,6 +131,21 @@
           router: this.$router
         })
         this.waitingForCreate = true
+      },
+      fetchAdmins() {
+        adminFetch({
+          url: '/api/admin/settings/admins',
+          handler: ({admins}) => this.admins = admins,
+          router: this.$router
+        })
+      },
+      deleteAdmin(admin) {
+        adminFetch({
+          url: '/api/admin/settings/admin/' + admin,
+          method: 'DELETE',
+          handler: () => this.fetchAdmins(),
+          router: this.$router
+        })
       }
     },
     components: {EmailSetting}
