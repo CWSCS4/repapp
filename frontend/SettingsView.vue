@@ -1,7 +1,7 @@
 <template>
   <div>
-    <md-layout md-align="center" md-gutter="16">
-      <md-layout md-flex="40">
+    <md-layout md-align="center" md-gutter="8">
+      <md-layout>
         <md-card>
           <md-card-header>
             <div class="md-title">Manage admins</div>
@@ -11,9 +11,12 @@
               <md-icon>add</md-icon>
             </md-button>
             <md-list>
-              <md-list-item v-for="admin in admins">
+              <md-list-item class="admin-row">
+                You (cannot delete)
+              </md-list-item>
+              <md-list-item class="admin-row" v-for="admin in admins">
                 {{ admin }}
-                <md-button class="md-raised" @click.native="deleteAdmin(admin)">
+                <md-button class="md-raised trash" @click.native="deleteAdmin(admin)">
                   <md-icon>delete</md-icon>
                 </md-button>
               </md-list-item>
@@ -21,7 +24,7 @@
           </md-card-content>
         </md-card>
       </md-layout>
-      <md-layout md-flex="40">
+      <md-layout>
         <md-card>
           <md-card-header>
             <div class="md-title">Email preferences</div>
@@ -151,3 +154,14 @@
     components: {EmailSetting}
   }
 </script>
+
+<style lang="sass">
+.md-card
+  width: 100%
+
+button.trash
+  margin-left: 20px
+
+.admin-row div
+  justify-content: flex-start !important
+</style>
