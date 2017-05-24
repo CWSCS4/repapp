@@ -34,7 +34,8 @@ router.get('/all', (req, res) => {
 router.post('/', (req, res) => {
   Tier.create({
     priority: req.body.priority,
-    description: req.body.description
+    collegeDescription: req.body.collegeDescription,
+    unavailabilityDescription: req.body.unavailabilityDescription
   })
     .then(() => res.json({success: true}))
     .catch(respondWithError(res))

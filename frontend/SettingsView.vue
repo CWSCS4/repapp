@@ -46,6 +46,9 @@
             <div class="md-title">Tiers</div>
           </md-card-header>
           <md-card-content>
+            <md-button class="md-raised md-accent" @click.native="openTierForm" id="new-tier">
+              <md-icon>add</md-icon>
+            </md-button>
             <md-table>
               <md-table-header>
                 <md-table-row>
@@ -61,9 +64,7 @@
                   <md-table-cell>{{ tier.collegeDescription }}</md-table-cell>
                   <md-table-cell>{{ tier.unavailabilityDescription }}</md-table-cell>
                   <md-table-cell>
-                     <md-button class="md-raised trash" @click.native="deleteTier(tier.priority)">
-                      <md-icon>delete</md-icon>
-                    </md-button>
+                    <md-icon class="delete-tier" @click.native="deleteTier(tier.priority)">delete</md-icon>
                   </md-table-cell>
                 </md-table-row>
               </md-table-body>
@@ -94,7 +95,32 @@
       </md-dialog-actions>
     </md-dialog>
     <!--Logs annoying errors if content is empty-->
-    <md-dialog-alert ref="creationError" md-title="Error creating admin" :md-content="adminForm.error || ' '"></md-dialog-alert>
+    <md-dialog-alert ref="adminCreationError" md-title="Error creating admin" :md-content="adminForm.error || ' '"></md-dialog-alert>
+
+    <md-dialog md-open-from="#new-tier" md-close-to="#new-tier" ref="tierForm">
+      <md-dialog-title>Make new tier</md-dialog-title>
+      <md-dialog-content>
+        <form>
+          <md-input-container>
+            <label>Priority</label>
+            <md-input type="number" required v-model="tierForm.priority" ref="priority"></md-input>
+          </md-input-container>
+          <md-input-container>
+            <label>College description</label>
+            <md-input v-model="tierForm.collegeDescription"></md-input>
+          </md-input-container>
+          <md-input-container>
+            <label>Unavailability description</label>
+            <md-input v-model="tierForm.unavailabilityDescription" @keyup.enter.native="createTier"></md-input>
+          </md-input-container>
+        </form>
+      </md-dialog-content>
+      <md-dialog-actions>
+        <md-spinner md-indeterminate v-show="waitingForCreate"></md-spinner>
+        <md-button class="md-primary" @click.native="closeTierForm">Cancel</md-button>
+        <md-button class="md-primary" @click.native="createTier">Done</md-button>
+      </md-dialog-actions>
+    </md-dialog>
   </div>
 </template>
 
@@ -109,6 +135,13 @@
       error: null
     }
   }
+  function emptyTierForm() {
+    return {
+      priority: 0,
+      collegeDescription: '',
+      unavailabilityDescription: ''
+    }
+  }
   export default {
     name: 'settings-view',
     data() {
@@ -121,6 +154,7 @@
         },
         emailSettings: null,
         adminForm: emptyAdminForm(),
+        tierForm: emptyTierForm(),
         waitingForCreate: false,
         admins: [],
         tiers: []
@@ -149,7 +183,7 @@
         else if (!this.adminForm.password) error = 'Please specify an initial password'
         if (error) {
           this.adminForm.error = error
-          this.$refs.creationError.open()
+          this.$refs.adminCreationError.open()
           return
         }
 
@@ -198,6 +232,31 @@
           handler: () => this.fetchTiers(),
           router: this.$router
         })
+      },
+      openTierForm() {
+        this.$refs.tierForm.open()
+        setTimeout(() => this.$refs.priority.$el.focus(), 300)
+      },
+      closeTierForm() {
+        this.$refs.tierForm.close()
+      },
+      createTier() {
+        adminFetch({
+          url: '/api/admin/tiers',
+          data: {
+            priority: Number(this.tierForm.priority),
+            collegeDescription: this.tierForm.collegeDescription || null,
+            unavailabilityDescription: this.tierForm.unavailabilityDescription || null
+          },
+          handler: () => {
+            this.fetchTiers()
+            this.closeTierForm()
+            this.waitingForCreate = false
+            this.tierForm = emptyTierForm()
+          },
+          router: this.$router
+        })
+        this.waitingForCreate = true
       }
     },
     components: {EmailSetting}
@@ -205,12 +264,15 @@
 </script>
 
 <style lang="sass">
-.md-card
-  width: 100%
+  .md-card
+    width: 100%
 
-button.trash
-  margin-left: 20px
+  button.trash
+    margin-left: 20px
 
-.list-item-row div
-  justify-content: flex-start !important
+  .list-item-row div
+    justify-content: flex-start !important
+
+  .delete-tier:hover
+    color: red
 </style>
