@@ -11,10 +11,10 @@
               <md-icon>add</md-icon>
             </md-button>
             <md-list>
-              <md-list-item class="admin-row">
+              <md-list-item class="list-item-row">
                 You (cannot delete)
               </md-list-item>
-              <md-list-item class="admin-row" v-for="admin in admins">
+              <md-list-item class="list-item-row" v-for="admin in admins">
                 {{ admin }}
                 <md-button class="md-raised trash" @click.native="deleteAdmin(admin)">
                   <md-icon>delete</md-icon>
@@ -37,6 +37,37 @@
               :label="EMAIL_SETTING_NAMES[setting]">
               </email-setting>
             </div>
+          </md-card-content>
+        </md-card>
+      </md-layout>
+      <md-layout>
+        <md-card>
+          <md-card-header>
+            <div class="md-title">Tiers</div>
+          </md-card-header>
+          <md-card-content>
+            <md-table>
+              <md-table-header>
+                <md-table-row>
+                  <md-table-head>Priority</md-table-head>
+                  <md-table-head>College description</md-table-head>
+                  <md-table-head>Unavailability description</md-table-head>
+                  <md-table-head>Delete</md-table-head>
+                </md-table-row>
+              </md-table-header>
+              <md-table-body>
+                <md-table-row v-for="tier in tiers">
+                  <md-table-cell md-numeric>{{ tier.priority }}</md-table-cell>
+                  <md-table-cell>{{ tier.collegeDescription }}</md-table-cell>
+                  <md-table-cell>{{ tier.unavailabilityDescription }}</md-table-cell>
+                  <md-table-cell>
+                     <md-button class="md-raised trash" @click.native="deleteTier(tier.priority)">
+                      <md-icon>delete</md-icon>
+                    </md-button>
+                  </md-table-cell>
+                </md-table-row>
+              </md-table-body>
+            </md-table>
           </md-card-content>
         </md-card>
       </md-layout>
@@ -91,7 +122,8 @@
         emailSettings: null,
         adminForm: emptyAdminForm(),
         waitingForCreate: false,
-        admins: []
+        admins: [],
+        tiers: []
       }
     },
     mounted() {
@@ -101,6 +133,7 @@
         router: this.$router
       })
       this.fetchAdmins()
+      this.fetchTiers()
     },
     methods: {
       openAdminForm() {
@@ -150,6 +183,21 @@
           handler: () => this.fetchAdmins(),
           router: this.$router
         })
+      },
+      fetchTiers() {
+        adminFetch({
+          url: '/api/admin/tiers/all',
+          handler: ({tiers}) => this.tiers = tiers,
+          router: this.$router
+        })
+      },
+      deleteTier(priority) {
+        adminFetch({
+          url: '/api/admin/tiers/' + String(priority),
+          method: 'DELETE',
+          handler: () => this.fetchTiers(),
+          router: this.$router
+        })
       }
     },
     components: {EmailSetting}
@@ -163,6 +211,6 @@
 button.trash
   margin-left: 20px
 
-.admin-row div
+.list-item-row div
   justify-content: flex-start !important
 </style>
