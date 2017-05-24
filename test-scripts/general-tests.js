@@ -4,6 +4,8 @@ const request = require('request')
 
 /*db.link.create({college: "UMass"})
 
+db.tier.create({priority:0, description:"Base unavailability"})
+
 request.post(
   'http://localhost:8000/api/admin/unavailabilities/period',
   { json: {
