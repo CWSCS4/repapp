@@ -68,7 +68,7 @@
         <form>
           <md-input-container>
             <label>College</label>
-            <md-input required v-model="linkForm.college"></md-input>
+            <md-input required v-model="linkForm.college" ref="college"></md-input>
           </md-input-container>
           <md-input-container>
             <label>Rep name</label>
@@ -78,7 +78,7 @@
             <label>Tier</label>
             <md-select required v-model="linkForm.tier">
               <md-option v-for="tier in tiers" :value="tier.priority">
-                {{ tier.description }}
+                {{ tier.collegeDescription }}
               </md-option>
             </md-select>
           </md-input-container>
@@ -167,15 +167,14 @@
         })
       },
       getTiers() {
-        setTimeout(() => { //will eventually send a request to the server
-          const tiers = [
-            {priority: 0, description: 'Impossible'},
-            {priority: 1, description: 'High'},
-            {priority: 2, description: 'Low'}
-          ]
-          this.tiers = tiers
-          this.linkForm = emptyLinkForm(tiers)
-        }, 500)
+        adminFetch({
+          url: '/api/admin/tiers/college',
+          handler: ({tiers}) => {
+            this.tiers = tiers
+            this.linkForm = emptyLinkForm(tiers)
+          },
+          router: this.$router
+        })
       },
       openNotes(link) {
         this.selectedNotes = link.notesFromCollege
@@ -189,6 +188,7 @@
       },
       openLinkForm() {
         this.$refs.linkForm.open()
+        setTimeout(() => this.$refs.college.$el.focus(), 300)
       },
       closeLinkForm() {
         this.$refs.linkForm.close()
