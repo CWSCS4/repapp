@@ -288,9 +288,7 @@
       getTiers() {
         adminFetch({
           url: '/api/admin/tiers/unavailability',
-          handler: ({tiers}) => {
-            this.tiers = tiers
-          },
+          handler: ({tiers}) => this.tiers = tiers,
           router: this.$router
         })
       },
