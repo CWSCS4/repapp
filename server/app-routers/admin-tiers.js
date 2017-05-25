@@ -1,6 +1,8 @@
 const express = require('express')
 const {tier: Tier} = require('../database')
 const respondWithError = require('../respond-with-error')
+const validatePostParams = require('../validate-post-params')
+
 const router = express.Router()
 
 for (const tierType of ['college', 'unavailability']) {
@@ -31,17 +33,30 @@ router.get('/all', (req, res) => {
     .catch(respondWithError(res))
 })
 
-router.post('/', (req, res) => {
-  Tier.create({
-    priority: req.body.priority,
-    collegeDescription: req.body.collegeDescription,
-    unavailabilityDescription: req.body.unavailabilityDescription
-  })
-    .then(() => res.json({success: true}))
-    .catch(respondWithError(res))
-})
+router.post('/',
+  validatePostParams({
+    priority: Number
+  }),
+  (req, res) => {
+    const {priority, collegeDescription, unavailabilityDescription} = req.body
+    Tier.findOne({
+      where: {priority}
+    })
+      .then(tier => {
+        if (tier) throw new Error('Priority already in use')
 
-router.delete('/:priority', function (req, res) {
+        return Tier.create({
+          priority,
+          collegeDescription,
+          unavailabilityDescription
+        })
+      })
+      .then(() => res.json({success: true}))
+      .catch(respondWithError(res))
+  }
+)
+
+router.delete('/:priority', (req, res) => {
   Tier.destroy({
     where: {priority: req.params.priority}
   })
