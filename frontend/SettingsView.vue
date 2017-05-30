@@ -13,10 +13,13 @@
             <md-list>
               <md-list-item class="list-item-row">
                 You (cannot delete)
+                <md-button class="md-raised left-spaced" @click.native="changePassword" id="password">
+                  <md-icon>lock_outline</md-icon>
+                </md-button>
               </md-list-item>
               <md-list-item class="list-item-row" v-for="admin in admins">
                 {{ admin }}
-                <md-button class="md-raised trash" @click.native="deleteAdmin(admin)">
+                <md-button class="md-raised left-spaced" @click.native="deleteAdmin(admin)">
                   <md-icon>delete</md-icon>
                 </md-button>
               </md-list-item>
@@ -77,16 +80,14 @@
     <md-dialog md-open-from="#new-admin" md-close-to="#new-admin" ref="adminForm">
       <md-dialog-title>Make new admin</md-dialog-title>
       <md-dialog-content>
-        <form>
-          <md-input-container>
-            <label>E-mail</label>
-            <md-input type="email" required v-model="adminForm.email" ref="email"></md-input>
-          </md-input-container>
-          <md-input-container>
-            <label>Password</label>
-            <md-input type="password" required v-model="adminForm.password" @keyup.enter.native="createAdmin"></md-input>
-          </md-input-container>
-        </form>
+        <md-input-container>
+          <label>E-mail</label>
+          <md-input type="email" required v-model="adminForm.email" ref="email"></md-input>
+        </md-input-container>
+        <md-input-container>
+          <label>Password</label>
+          <md-input type="password" required v-model="adminForm.password" @keyup.enter.native="createAdmin"></md-input>
+        </md-input-container>
       </md-dialog-content>
       <md-dialog-actions>
         <md-spinner md-indeterminate v-show="waitingForCreate"></md-spinner>
@@ -100,25 +101,37 @@
     <md-dialog md-open-from="#new-tier" md-close-to="#new-tier" ref="tierForm">
       <md-dialog-title>Make new tier</md-dialog-title>
       <md-dialog-content>
-        <form>
-          <md-input-container>
-            <label>Priority</label>
-            <md-input type="number" required v-model="tierForm.priority" ref="priority"></md-input>
-          </md-input-container>
-          <md-input-container>
-            <label>College description</label>
-            <md-input v-model="tierForm.collegeDescription"></md-input>
-          </md-input-container>
-          <md-input-container>
-            <label>Unavailability description</label>
-            <md-input v-model="tierForm.unavailabilityDescription" @keyup.enter.native="createTier"></md-input>
-          </md-input-container>
-        </form>
+        <md-input-container>
+          <label>Priority</label>
+          <md-input type="number" required v-model="tierForm.priority" ref="priority"></md-input>
+        </md-input-container>
+        <md-input-container>
+          <label>College description</label>
+          <md-input v-model="tierForm.collegeDescription"></md-input>
+        </md-input-container>
+        <md-input-container>
+          <label>Unavailability description</label>
+          <md-input v-model="tierForm.unavailabilityDescription" @keyup.enter.native="createTier"></md-input>
+        </md-input-container>
       </md-dialog-content>
       <md-dialog-actions>
         <md-spinner md-indeterminate v-show="waitingForCreate"></md-spinner>
         <md-button class="md-primary" @click.native="closeTierForm">Cancel</md-button>
         <md-button class="md-primary" @click.native="createTier">Done</md-button>
+      </md-dialog-actions>
+    </md-dialog>
+
+    <md-dialog md-open-from="#password" md-close-to="#password" ref="passwordForm">
+      <md-dialog-title>Change password</md-dialog-title>
+      <md-dialog-content>
+        <md-input-container md-has-password>
+          <label>New password</label>
+          <md-input type="password" required v-model="newPassword" ref="password" @keyup.enter.native="savePassword"></md-input>
+        </md-input-container>
+      </md-dialog-content>
+      <md-dialog-actions>
+        <md-spinner md-indeterminate v-show="waitingForCreate"></md-spinner>
+        <md-button class="md-primary" @click.native="savePassword">Done</md-button>
       </md-dialog-actions>
     </md-dialog>
   </div>
@@ -157,7 +170,8 @@
         tierForm: emptyTierForm(),
         waitingForCreate: false,
         admins: [],
-        tiers: []
+        tiers: [],
+        newPassword: ''
       }
     },
     mounted() {
@@ -257,6 +271,21 @@
           router: this.$router
         })
         this.waitingForCreate = true
+      },
+      changePassword() {
+        this.newPassword = ''
+        this.$refs.passwordForm.open()
+        setTimeout(() => this.$refs.password.$el.focus(), 300)
+      },
+      savePassword() {
+        adminFetch({
+          url: '/api/admin/settings/password',
+          data: {password: this.newPassword},
+          handler: () => {
+            this.waitingForCreate = false
+            this.$refs.passwordForm.close()
+          }
+        })
       }
     },
     components: {EmailSetting}
@@ -268,6 +297,9 @@
     width: 100%
 
   button.trash
+    margin-left: 20px
+
+  button.left-spaced
     margin-left: 20px
 
   .list-item-row div
